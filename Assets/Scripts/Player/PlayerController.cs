@@ -57,4 +57,12 @@ public class PlayerController : MonoBehaviour
             curMovementInput = Vector2.zero;
         }
     }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Started)
+        {
+            _rigidbody.AddForce(Vector2.up * jumpPower, ForceMode.Impulse);
+        }
+    }
 }
