@@ -14,7 +14,7 @@ public class Interaction : MonoBehaviour
     public GameObject curInteractGamObject;
     public IInteractable curInteractable;
 
-    //public TextMeshProUGUI promtText;
+    public TextMeshProUGUI promtText;
     private Camera cam;
 
     private PlayerController controller;
@@ -28,40 +28,46 @@ public class Interaction : MonoBehaviour
 
     void Update()
     {
-        if (Time.deltaTime - lastCheckTime > checkRate)
+        if (Time.time - lastCheckTime > checkRate)
         {
             lastCheckTime = Time.time;
 
-            Ray ray = cam.ScreenPointToRay(new Vector3 (Screen.width / 2, Screen.height / 2));
-
+            Ray ray = cam.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit, maxCheckDistance, layerMask))
             {
-                if(hit.collider.gameObject != curInteractGamObject)
+                if (hit.collider.gameObject != curInteractGamObject)
                 {
                     curInteractGamObject = hit.collider.gameObject;
                     curInteractable = hit.collider.GetComponent<IInteractable>();
+                    SetPromtText();
                 }
             }
             else
             {
-                curInteractable = null;
                 curInteractGamObject = null;
+                curInteractable = null;
+                promtText.gameObject.SetActive(false);
             }
         }
     }
 
     public void OnIteractInput(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Started)//&& curInteractable != null)
+        if (context.phase == InputActionPhase.Started && curInteractable != null)
         {
             curInteractable.OnInteract();
             curInteractGamObject = null;
             curInteractable = null;
-            Debug.Log("´­·¶´Ù");
-            //promtText.gameObject.SetActive(false);
+            promtText.gameObject.SetActive(false);
         }
+    }
+
+    private void SetPromtText()
+    {
+        promtText.gameObject.SetActive(true);
+        promtText.text = curInteractable.GetInteractPrompt();
     }
 
     void EventItem()
